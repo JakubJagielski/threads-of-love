@@ -94,8 +94,28 @@
 
 <div class="years-bar" id="years"></div>
 <div class="timeline-container" id="timelineContainer"></div>
-
+<script type="text/csv" id="csv-data"></script>
 <!-- Inline CSV data -->
+ <script type="text/javascript">
+  async function loadTimelineData() {
+    const sheetURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR0NBdRQYRCTzprSCkC-PYT90K9IDNyMowjniboPK_TQAGljNxW6ILM0CszM12xiUIa3iqKD_rAKPXP/pub?gid=1532830983&single=true&output=csv';
+    const resp = await fetch(sheetURL);
+    if (!resp.ok) throw new Error(`HTTP error! status: ${resp.status}`);
+    const csvText = await resp.text();
+
+    const scriptElem = document.getElementById('csv-data');
+    if (scriptElem) {
+      scriptElem.textContent = csvText;
+    }
+  }
+
+  // Call on load
+  window.addEventListener('DOMContentLoaded', loadTimelineData);
+</script>
+
+
+<!-- </script>
+
 <script type="text/csv" id="csv-data">name,date,description,city,source
 Jakub Jagielski,2012,Some placeholder text :((,berlin ,https://picsum.photos/1200/800?1
 Jakub Jagielski,2012,Some placeholder text :((,berlin ,https://picsum.photos/1200/800?2
@@ -120,7 +140,7 @@ Jakub Jagielski,2023,Some placeholder text :((,berlin ,https://picsum.photos/120
 Jakub Jagielski,2023,Some placeholder text :((,berlin ,https://picsum.photos/1200/800?21
 Jakub Jagielski,2023,Some placeholder text :((,berlin ,https://picsum.photos/1200/800?22
 Jakub Jagielski,2025,Some placeholder text :((,berlin ,https://picsum.photos/1200/800?23
-</script>
+</script> -->
 
 <!-- PapaParse -->
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
