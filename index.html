@@ -111,7 +111,8 @@ function driveViewToThumbnail(driveUrl, width = 1000) {
 }
 
 async function fetchTimelineCSVData() {
-  const sheetURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR0NBdRQYRCTzprSCkC-PYT90K9IDNyMowjniboPK_TQAGljNxW6ILM0CszM12xiUIa3iqKD_rAKPXP/pub?gid=1532830983&single=true&output=csv';
+  // const sheetURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR0NBdRQYRCTzprSCkC-PYT90K9IDNyMowjniboPK_TQAGljNxW6ILM0CszM12xiUIa3iqKD_rAKPXP/pub?gid=1532830983&single=true&output=csv';
+  const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR0NBdRQYRCTzprSCkC-PYT90K9IDNyMowjniboPK_TQAGljNxW6ILM0CszM12xiUIa3iqKD_rAKPXP/pub?gid=2055864337&single=true&output=csv"
   const resp = await fetch(sheetURL);
   if (!resp.ok) throw new Error(`HTTP error! status: ${resp.status}`);
   return await resp.text();
@@ -121,15 +122,15 @@ async function initTimeline({ containerEl, yearsEl }) {
   // --- Fetch and parse CSV ---
   const csvText = await fetchTimelineCSVData();
   const data = Papa.parse(csvText, { header: true }).data
-    .filter(row => row.date && row.source)
+    .filter(row => row.Year && row.Photograph)
     .map(row => {
-      const dateObj = new Date(row.date);
+      const dateObj = new Date(row.Year);
       return {
         fullYear: dateObj.getFullYear(),
         yearDisplay: dateObj.getFullYear() % 100,
-        img: row.source,
-        desc: row.description || "",
-        author: (row.city || "") + (row.name ? " - " + row.name : "")
+        img: row.Photograph,
+        desc: row.Description || "",
+        author: (row.City || "") + (row.Name ? " - " + row.Name : "")
       };
     });
 
