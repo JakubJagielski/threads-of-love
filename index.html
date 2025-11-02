@@ -98,6 +98,18 @@
 
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 <script type="module">
+
+function driveViewToThumbnail(driveUrl, width = 1000) {
+  // Match the file ID using regex
+  const match = driveUrl.match(/\/d\/([a-zA-Z0-9_-]+)/);
+  if (!match) {
+    console.warn("Invalid Google Drive URL:", driveUrl);
+    return driveUrl; // fallback to original URL
+  }
+  const fileId = match[1];
+  return `https://drive.google.com/thumbnail?id=${fileId}&sz=w${width}`;
+}
+
 async function fetchTimelineCSVData() {
   const sheetURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR0NBdRQYRCTzprSCkC-PYT90K9IDNyMowjniboPK_TQAGljNxW6ILM0CszM12xiUIa3iqKD_rAKPXP/pub?gid=1532830983&single=true&output=csv';
   const resp = await fetch(sheetURL);
@@ -145,7 +157,7 @@ function buildTimeline(data, { containerEl, yearsEl }) {
     div.className = "timeline-item";
     div.dataset.year = item.fullYear;
     div.innerHTML = `
-      <img data-src="${item.img}" alt="${item.desc}">
+      <img data-src="${driveViewToThumbnail(item.img)}" alt="${item.desc}">
       <div class="caption">
         <strong>${item.desc}</strong><br>${item.author}
       </div>`;
