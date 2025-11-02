@@ -102,13 +102,12 @@ async function fetchTimelineCSVData() {
   const sheetURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR0NBdRQYRCTzprSCkC-PYT90K9IDNyMowjniboPK_TQAGljNxW6ILM0CszM12xiUIa3iqKD_rAKPXP/pub?gid=1532830983&single=true&output=csv';
   const resp = await fetch(sheetURL);
   if (!resp.ok) throw new Error(`HTTP error! status: ${resp.status}`);
-  return await resp.text()
+  return await resp.text();
 }
 
-const container = document.getElementById("timelineContainer");
-async function initTimeline() {
+async function initTimeline({ containerEl, yearsEl }) {
+  // --- Fetch and parse CSV ---
   const csvText = await fetchTimelineCSVData();
-
   const data = Papa.parse(csvText, { header: true }).data
     .filter(row => row.date && row.source)
     .map(row => {
@@ -122,24 +121,25 @@ async function initTimeline() {
       };
     });
 
-  buildTimeline(data);
+  // --- Build UI ---
+  buildTimeline(data, { containerEl, yearsEl });
 }
 
-initTimeline()
+function buildTimeline(data, { containerEl, yearsEl }) {
+  // Build year navigation
+  const years = [...new Set(data.map(d => d.fullYear))].sort((a, b) => a - b);
+  yearsEl.innerHTML = ""; // clear old content
 
-function buildTimeline(data) {
-  // Build years bar
-  const years = [...new Set(data.map(d => d.fullYear))].sort((a,b)=>a-b);
-  const yearsDiv = document.getElementById("years");
   years.forEach(y => {
     const el = document.createElement("span");
-    el.textContent = y % 100; // show only last two digits
+    el.textContent = y % 100;
     el.className = "year";
-    el.onclick = () => scrollToYear(y);
-    yearsDiv.appendChild(el);
+    el.onclick = () => scrollToYear(y, containerEl, yearsEl);
+    yearsEl.appendChild(el);
   });
 
   // Build timeline items
+  containerEl.innerHTML = "";
   data.forEach(item => {
     const div = document.createElement("div");
     div.className = "timeline-item";
@@ -149,50 +149,58 @@ function buildTimeline(data) {
       <div class="caption">
         <strong>${item.desc}</strong><br>${item.author}
       </div>`;
-    container.appendChild(div);
+    containerEl.appendChild(div);
   });
 
   // Lazy load images
   const observer = new IntersectionObserver(entries => {
     entries.forEach(entry => {
-      if(entry.isIntersecting) {
+      if (entry.isIntersecting) {
         const img = entry.target;
         img.src = img.dataset.src;
         img.onload = () => img.classList.add("loaded");
         observer.unobserve(img);
       }
     });
-  }, { root: container, threshold: 0.2 });
-  document.querySelectorAll(".timeline-item img").forEach(img => observer.observe(img));
+  }, { root: containerEl, threshold: 0.2 });
+  containerEl.querySelectorAll(".timeline-item img").forEach(img => observer.observe(img));
 
   // Scroll highlight
-  container.addEventListener("scroll", () => {
-    const items = document.querySelectorAll(".timeline-item");
+  containerEl.addEventListener("scroll", () => {
+    const items = containerEl.querySelectorAll(".timeline-item");
     let visibleYear = null;
     items.forEach(el => {
       const rect = el.getBoundingClientRect();
-      if(rect.top >= 0 && rect.top < window.innerHeight / 2) visibleYear = el.dataset.year;
+      if (rect.top >= 0 && rect.top < window.innerHeight / 2) visibleYear = el.dataset.year;
     });
-    if(visibleYear) highlightYear(visibleYear);
+    if (visibleYear) highlightYear(visibleYear, yearsEl);
   });
 }
 
-// Highlight year
-function highlightYear(activeYear) {
-  document.querySelectorAll(".year").forEach(yEl => {
+// Highlight active year
+function highlightYear(activeYear, yearsEl) {
+  yearsEl.querySelectorAll(".year").forEach(yEl => {
     yEl.classList.toggle("active", yEl.textContent == activeYear % 100);
   });
 }
 
-// Scroll to a year
-function scrollToYear(fullYear) {
-  const el = document.querySelector(`.timeline-item[data-year='${fullYear}']`);
-  if(el) {
+// Smooth scroll to year
+function scrollToYear(fullYear, containerEl, yearsEl) {
+  const el = containerEl.querySelector(`.timeline-item[data-year='${fullYear}']`);
+  if (el) {
     el.scrollIntoView({ behavior: "smooth", block: "start" });
-    highlightYear(fullYear);
+    highlightYear(fullYear, yearsEl);
   }
 }
+
+// ---- INIT on DOM load ----
+window.addEventListener("DOMContentLoaded", () => {
+  const containerEl = document.getElementById("timelineContainer");
+  const yearsEl = document.getElementById("years");
+  initTimeline({ containerEl, yearsEl });
+});
 </script>
+
 
 </body>
 </html>
