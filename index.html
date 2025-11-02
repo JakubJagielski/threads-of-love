@@ -94,14 +94,15 @@
 
 <div class="years-bar" id="years"></div>
 <div class="timeline-container" id="timelineContainer"></div>
-<script type="text/csv" id="csv-data"></script>
+
+
 <!-- Inline CSV data -->
-<script type="text/javascript">
+<script type="module">
 async function fetchTimelineCSVData() {
   const sheetURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR0NBdRQYRCTzprSCkC-PYT90K9IDNyMowjniboPK_TQAGljNxW6ILM0CszM12xiUIa3iqKD_rAKPXP/pub?gid=1532830983&single=true&output=csv';
-  const resp = fetch(sheetURL);
+  const resp = await fetch(sheetURL);
   if (!resp.ok) throw new Error(`HTTP error! status: ${resp.status}`);
-  return resp.text()
+  return await resp.text()
 }
 
 </script>
@@ -112,22 +113,26 @@ async function fetchTimelineCSVData() {
 <script>
 const container = document.getElementById("timelineContainer");
 
-// Parse CSV
-const csvText = fetchTimelineCSVData()
-const data = Papa.parse(csvText, { header: true }).data
-  .filter(row => row.date && row.source)
-  .map(row => {
-    const dateObj = new Date(row.date);
-    return {
-      fullYear: dateObj.getFullYear(),   // full year internally
-      yearDisplay: dateObj.getFullYear() % 100, // show last two digits
-      img: row.source,
-      desc: row.description || "",
-      author: (row.city || "") + (row.name ? " - " + row.name : "")
-    };
-  });
+async function initTimeline() {
+  const csvText = await fetchTimelineCSVData();
 
-buildTimeline(data);
+  const data = Papa.parse(csvText, { header: true }).data
+    .filter(row => row.date && row.source)
+    .map(row => {
+      const dateObj = new Date(row.date);
+      return {
+        fullYear: dateObj.getFullYear(),
+        yearDisplay: dateObj.getFullYear() % 100,
+        img: row.source,
+        desc: row.description || "",
+        author: (row.city || "") + (row.name ? " - " + row.name : "")
+      };
+    });
+
+  buildTimeline(data);
+}
+
+initTimeline()
 
 function buildTimeline(data) {
   // Build years bar
