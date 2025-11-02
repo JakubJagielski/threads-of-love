@@ -96,7 +96,7 @@
 <div class="timeline-container" id="timelineContainer"></div>
 
 
-<!-- Inline CSV data -->
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 <script type="module">
 async function fetchTimelineCSVData() {
   const sheetURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR0NBdRQYRCTzprSCkC-PYT90K9IDNyMowjniboPK_TQAGljNxW6ILM0CszM12xiUIa3iqKD_rAKPXP/pub?gid=1532830983&single=true&output=csv';
@@ -105,14 +105,7 @@ async function fetchTimelineCSVData() {
   return await resp.text()
 }
 
-</script>
-
-
-<!-- PapaParse -->
-<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-<script>
 const container = document.getElementById("timelineContainer");
-
 async function initTimeline() {
   const csvText = await fetchTimelineCSVData();
 
