@@ -63,9 +63,9 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     text-align: center;
-    min-height: calc(100vh - 48px);
+    min-height: auto;
     width: 100%;
     gap: 10px;
   }
@@ -111,7 +111,6 @@ function driveViewToThumbnail(driveUrl, width = 1000) {
 }
 
 async function fetchTimelineCSVData() {
-  // const sheetURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR0NBdRQYRCTzprSCkC-PYT90K9IDNyMowjniboPK_TQAGljNxW6ILM0CszM12xiUIa3iqKD_rAKPXP/pub?gid=1532830983&single=true&output=csv';
   const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR0NBdRQYRCTzprSCkC-PYT90K9IDNyMowjniboPK_TQAGljNxW6ILM0CszM12xiUIa3iqKD_rAKPXP/pub?gid=2055864337&single=true&output=csv"
   const resp = await fetch(sheetURL);
   if (!resp.ok) throw new Error(`HTTP error! status: ${resp.status}`);
