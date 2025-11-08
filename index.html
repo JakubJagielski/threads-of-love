@@ -178,7 +178,7 @@ const createTimelineItem = ({ img, description, author }) => {
   item.className = "timeline-item";
   item.innerHTML = `
     <img data-src="${driveThumbnail(img)}" alt="${description}">
-    <div class="caption"><strong>${description}</strong><br>${author}</div>
+    <div class="caption">${description}<br>${author}</div>
   `;
   return item;
 };
