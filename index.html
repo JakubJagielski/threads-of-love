@@ -28,19 +28,6 @@
     overflow-y: auto;
     scroll-behavior: smooth;
   }
-  
-  .page-wrapper {
-    width: var(--card-width); 
-    max-width: 800px;
-    min-height: 100vh;
-    margin: 20px auto;
-    border: 1px solid #aaa;
-    box-sizing: border-box;
-    background: #fff;
-    padding: 40px 20px;
-  }
-
-
 
   /* GENERIC FULL PAGE */
   .full-page {
@@ -136,25 +123,22 @@
 <div class="scroll-wrapper" id="scrollWrapper">
 
   <!-- PAGE 1 -->
-  <section class="page-wrapper full-page">
+  <section class="full-page">
     <div class="landing-title">Threads of Love</div>
   </section>
 
   <!-- PAGE 2 -->
-  <section class="page-wrapper full-page">
+  <section class="full-page">
     <div class="intro-text">
       This is a chronicle of a relationship, told from the point of view of those who have witnessed it, up close, over the years.
     </div>
   </section>
 
-  <!-- PAGE 3 (TIMELINE) -->
-  <section class="page-wrapper">
-    <div class="years-bar" id="years"></div>
-    <div class="timeline-container" id="timelineContainer"></div>
-  </section>
+  <!-- TIMELINE SECTION -->
+  <div class="years-bar" id="years"></div>
+  <div class="timeline-container" id="timelineContainer"></div>
 
 </div>
-
 
 
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
