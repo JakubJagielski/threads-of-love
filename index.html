@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Album Timeline</title>
+<title>Threads of Love</title>
+
 <style>
   :root {
     --card-width: min(80vw, 800px);
@@ -21,11 +22,43 @@
     overflow: hidden;
   }
 
+  /* PAGE WRAPPER */
+  .scroll-wrapper {
+    height: 100vh;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+  }
+
+  /* GENERIC FULL PAGE */
+  .full-page {
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    box-sizing: border-box;
+    text-align: center;
+  }
+
+  /* PAGE 1: LANDING */
+  .landing-title {
+    font-size: 2.5rem;
+    font-weight: 600;
+  }
+
+  /* PAGE 2: INTRO */
+  .intro-text {
+    font-size: 1.2rem;
+    max-width: 600px;
+    line-height: 1.5;
+  }
+
   /* Years bar */
   .years-bar {
-    position: fixed;
+    position: sticky;
     top: 0;
-    left: 0;
     width: 100%;
     background: #fff;
     border-bottom: 1px solid #aaa;
@@ -46,19 +79,12 @@
     font-weight: bold;
   }
 
-  /* Timeline container */
+  /* TIMELINE */
   .timeline-container {
-    position: absolute;
-    top: var(--header-height);
-    left: 0;
-    right: 0;
-    bottom: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
-    overflow-y: auto;
-    scroll-behavior: smooth;
-    padding-bottom: 20px;
+    padding-bottom: 40px;
   }
 
   .timeline-item {
@@ -68,7 +94,7 @@
     text-align: center;
     width: 100%;
     gap: 10px;
-    margin-bottom: 20px;
+    margin-bottom: 40px;
   }
 
   .timeline-item img {
@@ -91,10 +117,29 @@
   }
 </style>
 </head>
+
 <body>
 
-<div class="years-bar" id="years"></div>
-<div class="timeline-container" id="timelineContainer"></div>
+<div class="scroll-wrapper" id="scrollWrapper">
+
+  <!-- PAGE 1 -->
+  <section class="full-page">
+    <div class="landing-title">Threads of Love</div>
+  </section>
+
+  <!-- PAGE 2 -->
+  <section class="full-page">
+    <div class="intro-text">
+      This is a chronicle of a relationship, told from the point of view of those who have witnessed it, up close, over the years.
+    </div>
+  </section>
+
+  <!-- TIMELINE SECTION -->
+  <div class="years-bar" id="years"></div>
+  <div class="timeline-container" id="timelineContainer"></div>
+
+</div>
+
 
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 <script type="module">
@@ -102,11 +147,7 @@
 // ---------------------- UTILITY FUNCTIONS ----------------------
 const driveThumbnail = (url, width = 1000) => {
   const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
-  if (!match) {
-    console.warn("Invalid Google Drive URL:", url);
-    return url;
-  }
-  return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w${width}`;
+  return match ? `https://drive.google.com/thumbnail?id=${match[1]}&sz=w${width}` : url;
 };
 
 const fetchCSV = async (url) => {
@@ -165,8 +206,9 @@ const setupLazyLoading = (containerEl) => {
         }
       });
     },
-    { root: containerEl, threshold: 0.2 }
+    { root: document.getElementById("scrollWrapper"), threshold: 0.2 }
   );
+
   containerEl.querySelectorAll("img").forEach(img => observer.observe(img));
 };
 
@@ -186,11 +228,13 @@ const scrollToYear = (year, containerEl, yearsEl) => {
 };
 
 const monitorScroll = (containerEl, yearsEl) => {
-  containerEl.addEventListener("scroll", () => {
+  const scrollWrapper = document.getElementById("scrollWrapper");
+
+  scrollWrapper.addEventListener("scroll", () => {
     const items = containerEl.querySelectorAll(".timeline-item");
     const visibleItem = [...items].find(el => {
       const rect = el.getBoundingClientRect();
-      return rect.top >= 0 && rect.top < window.innerHeight / 2;
+      return rect.top >= 100 && rect.top < window.innerHeight / 2;
     });
     if (visibleItem) highlightActiveYear(parseInt(visibleItem.dataset.year), yearsEl);
   });
@@ -202,28 +246,25 @@ const initTimeline = async (containerEl, yearsEl) => {
   const csvText = await fetchCSV(csvUrl);
   const timelineData = parseTimelineData(csvText);
 
-  // Build years nav
   const years = [...new Set(timelineData.map(d => d.year))].sort((a, b) => a - b);
   createYearNavigation(years, yearsEl, year => scrollToYear(year, containerEl, yearsEl));
 
-  // Build timeline items
   containerEl.innerHTML = "";
   timelineData.forEach(item => {
-    const timelineItemEl = createTimelineItem(item);
-    timelineItemEl.dataset.year = item.year;
-    containerEl.appendChild(timelineItemEl);
+    const ele = createTimelineItem(item);
+    ele.dataset.year = item.year;
+    containerEl.appendChild(ele);
   });
 
-  // Setup lazy loading & scroll highlight
   setupLazyLoading(containerEl);
   monitorScroll(containerEl, yearsEl);
 };
 
 // ---------------------- DOM READY ----------------------
 window.addEventListener("DOMContentLoaded", () => {
-  const timelineContainer = document.getElementById("timelineContainer");
-  const yearsContainer = document.getElementById("years");
-  initTimeline(timelineContainer, yearsContainer);
+  const container = document.getElementById("timelineContainer");
+  const years = document.getElementById("years");
+  initTimeline(container, years);
 });
 
 </script>
