@@ -73,6 +73,12 @@
     margin: auto;
   }
 
+  @media (max-width: 600px) {
+    .years-grid {
+      grid-template-columns: repeat(8, 1fr);
+    }
+  }
+
   .year {
     font-size: 16px;
     color: #000;
@@ -120,7 +126,13 @@
     max-width: var(--card-width);
     font-size: 1rem;
     line-height: 1.6;
-    text-align: justify; /* ✅ justify text */
+  }
+  .caption-text {
+    text-align: justify;
+  }
+  .caption-author {
+    text-align: left;
+    margin-top: 6px;
   }
 </style>
 </head>
@@ -176,11 +188,12 @@ const createTimelineItem = ({ img, description, author }) => {
   item.className = "timeline-item";
   item.innerHTML = `
     <img data-src="${driveThumbnail(img)}" alt="${description}">
-    <div class="caption">${description}<br>${author}</div>
+    <div class=\"caption\"><div class=\"caption-text\">${description}</div><div class=\"caption-author\">${author}</div></div>
   `;
   return item;
 };
 
+/* ✅ Split years into two lines using CSS grid */
 const createYearNavigation = (years, containerEl, onClickYear) => {
   containerEl.innerHTML = "";
   const grid = document.createElement("div");
