@@ -65,17 +65,22 @@
   }
 
   .years-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(20px, 1fr));
-    row-gap: 8px;
-    justify-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
     max-width: 500px;
     margin: auto;
   }
 
   @media (max-width: 600px) {
     .years-grid {
-      grid-template-columns: repeat(8, 1fr);
+      display: inline-flex;
+      flex-wrap: wrap;
+      justify-content: center; /* center all rows, including last row */
+      gap: 8px;
+      max-width: 100%;
+      margin: 0 auto;
     }
   }
 
